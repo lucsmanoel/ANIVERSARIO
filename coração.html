@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explosão de Corações e Estrela Brilhante</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: #282c34;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* Estilo da mensagem */
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Arial', sans-serif;
+            font-size: 30px;
+            color: white;
+            text-align: center;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="heartCanvas"></canvas>
+    <div class="message">Deus te abençoe hoje e sempre</div>
+
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ajuste o tamanho do canvas para cobrir a tela inteira
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Função para gerar as partículas no formato de coração
+        function heart(t) {
+            const x = 16 * Math.sin(t) ** 3;
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+            return { x: x * 20 + canvas.width / 2, y: -y * 20 + canvas.height / 3 }; // Ajusta a posição no canvas
+        }
+
+        // Classe para a partícula
+        class Particle {
+            constructor(x, y, explode = false, isStar = false) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 2; // Tamanho aleatório
+                this.speedX = Math.random() * 4 - 2; // Velocidade aleatória no eixo X
+                this.speedY = Math.random() * 4 - 2; // Velocidade aleatória no eixo Y
+                this.life = 100; // Tempo de vida da partícula
+                this.explode = explode; // Se a partícula deve explodir
+                this.isStar = isStar; // Se a partícula pertence à estrela
+                if (this.explode) {
+                    // As partículas que vão "explodir" se movem mais rapidamente
+                    this.speedX *= 5;
+                    this.speedY *= 5;
+                }
+                if (this.isStar) {
+                    // As partículas da estrela terão uma cor amarela
+                    this.color = 'rgba(255, 255, 0, ' + this.life / 100 + ')';
+                } else {
+                    // As partículas do coração serão vermelhas
+                    this.color = 'rgba(255, 0, 0, ' + this.life / 100 + ')';
+                }
+            }
+
+            // Método para atualizar a posição e o comportamento da partícula
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.size *= 0.98; // Reduz o tamanho para simular o desaparecimento
+                this.life -= 1;
+            }
+
+            // Método para desenhar a partícula
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        let particles = [];
+        let isExploded = false; // Flag para verificar se o coração explodiu
+        let isStarVisible = false; // Flag para verificar se a estrela foi ativada
+        let starParticles = []; // Partículas da estrela
+
+        // Função para "explodir" o coração
+        function explodeHeart() {
+            let t = 0;
+            // Gerar as partículas do coração original
+            for (let i = 0; i < 1000; i++) {
+                const point = heart(t); // Calcula as coordenadas do coração
+                t += Math.PI / 100;
+
+                // Agora, ao "explodir", todas as partículas se movem rapidamente
+                particles.push(new Particle(point.x, point.y, true));
+            }
+            isExploded = true;
+        }
+
+        // Função para gerar a estrela brilhante após a explosão
+        function generateStar() {
+            const starCenterX = canvas.width / 2;
+            const starCenterY = canvas.height / 3;
+            let t = 0;
+            for (let i = 0; i < 500; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 30 + 10;
+                const x = starCenterX + distance * Math.cos(angle);
+                const y = starCenterY + distance * Math.sin(angle);
+                starParticles.push(new Particle(x, y, false, true));
+                t += Math.PI / 100;
+            }
+            isStarVisible = true;
+        }
+
+        // Criando as partículas e atualizando a tela
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas
+
+            if (!isExploded) {
+                let t = 0;
+                // Criar partículas apenas dentro da forma do coração
+                for (let i = 0; i < 1000; i++) {
+                    const point = heart(t); // Calcula as coordenadas do coração
+                    t += Math.PI / 100;
+                    if (Math.random() > 0.7) {
+                        particles.push(new Particle(point.x, point.y));
+                    }
+                }
+            }
+
+            // Atualizando e desenhando as partículas do coração
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // Remover partículas que perderam a vida
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+
+            // Após a explosão, se todas as partículas do coração desaparecerem, gera a estrela
+            if (isExploded && particles.length === 0 && !isStarVisible) {
+                generateStar(); // Gerar a estrela
+            }
+
+            // Atualizando e desenhando as partículas da estrela
+            if (isStarVisible) {
+                for (let i = 0; i < starParticles.length; i++) {
+                    starParticles[i].update();
+                    starParticles[i].draw();
+
+                    // Remover partículas que perderam a vida
+                    if (starParticles[i].life <= 0) {
+                        starParticles.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate); // Chama a animação novamente
+        }
+
+        // Inicia a animação
+        animate();
+
+        // Adiciona a explosão ao clicar
+        canvas.addEventListener('click', () => {
+            if (!isExploded) {
+                explodeHeart(); // Explode o coração ao clicar
+            }
+        });
+
+    </script>
+</body>
+</html>

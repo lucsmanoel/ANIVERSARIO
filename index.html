@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homenagem de Aniversário</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- Adicionando o player de áudio -->
+    <audio id="backgroundMusic" autoplay loop>
+        <source src="./seu-jorge.mpeg" type="audio/mp3">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+    <h1 id="titulo" class="animated-title">Feliz Aniversário!</h1>
+    <div class="gallery">
+        <img src="/imagens/perfil.jpeg" alt="Foto 1">
+        <img src="./imagens/olhar fatal.jpeg" alt="Foto 2">
+       <a href="coração.html"><img src="./imagens/bolo.jpeg" alt="Foto 3"></a> 
+       <img src="./imagens/camaleao.jpeg" alt="">
+    </div>
+    
+    <div class="heart" id="heart">❤️</div>
+    <div class="message" id="message">🎉🎂</div>
+    <div class="floating-messages">
+        <div class="message-card">Você é um homem sensacional, alem de bonito, e gostoso, e você sabe o que eu acho né kkk</div>
+        <div class="message-card">Deus me abençoo muito com sua vida, por que você já me ensinou tanta coisa, muito obrigado você é taõ especial, voce é meio presepeiro tambem viu, as vezes queria te dar uma pisa🎈✨</div>
+        <div class="message-card">você é um grande homem, quero que sinta sempre orgulho de cada batalha que vencer, ⁠Se estiver se sentindo desmotivados ou sentindo que não é bom o suficiente incendeie 🔥 o seu coração💓 saiba que se precisar de mim ❤️🎁</div>
+        <div class="message-card">Acredite, pense e faça,
+            use sua intuição,
+            transforme sonho em suor,
+            pensamento em ação.
+            Enfrente cada batalha
+            sabendo que a gente falha
+            e que isso é natural,
+            cair pra se levantar,
+            aprender para ensinar
+            que o bem é maior que o mal. 🌟🎊</div>
+    </div>
+    <script>
+        function showHeart() {
+    document.getElementById('heart').style.display = 'block';
+}
+
+// Pergunta o nome da pessoa
+const nome = prompt("Digite seu nome para continuar:");
+if (nome) {
+    document.getElementById('message').innerHTML = `Feliz Aniversário, ${nome}! 🎉🎂`;
+    document.getElementById('titulo').innerText = `Feliz Aniversário, ${nome}!`;
+    alert(`${nome},leias as mensagens, depois clique no bolo agora clique no bolo para ver uma surpresa!`);
+}
+</script>
